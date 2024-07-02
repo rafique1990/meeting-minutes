@@ -1,0 +1,38 @@
+version: '3'
+services:
+  postgresqldb:
+    build: ./postgres
+    container_name: postgresqldb
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    environment:
+      - DB_SERVER=postgresqldb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=meeting
+      - POSTGRES_DB=meeting
+    ports:
+      - "5432:5432"
+  meetingbackend:
+    build: ./
+    container_name: meetingbackend
+    environment:
+      - DB_SERVER=postgresqldb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=meeting
+      - POSTGRES_DB=meeting
+    depends_on:
+      - postgresqldb
+    ports:
+      - "8080:8080"
+    links:
+      - postgresqldb
+  #Front-end vue js Application
+  meeting-ui:
+    build: ./meeting-ui
+    container_name: meeting-ui
+    ports:
+      - 4200:8080
+    links:
+      - meetingbackend
+volumes:
+  db-data:

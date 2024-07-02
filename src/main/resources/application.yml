@@ -1,0 +1,66 @@
+server:
+  port : 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://postgresqldb:5432/meeting
+    username: postgres
+    password: meeting
+#  When you create an app in these OAuth2 providers websites for example google, you must add an authorized redirect URI that matches this template.
+#  For example, for your google app, you need to add the authorizedRedirectURI http://localhost:8080/oauth2/callback/google.
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
+          jdbc:
+            lob:
+              non_contextual_creation: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${GOOGLE_CLIENT_ID}
+            clientSecret: ${GOOGLE_CLIENT_SECRET}
+            redirectUri: "http://localhost:8080/oauth2/callback/google"
+            authorizationUri: https://accounts.google.com/o/oauth2/v2/auth?access_type=offline
+            scope:
+              - email
+              - profile
+#              - openid
+          facebook:
+            clientId: ${FACEBOOK_CLIENT_ID}
+            clientSecret: ${FACEBOOK_CLIENT_SECRET}
+            redirectUri: "http://localhost:8080/oauth2/callback/facebook"
+            scope:
+              - email
+              - public_profile
+          github:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}
+            redirectUri: "http://localhost:8080/oauth2/callback/github"
+            scope:
+              - user:email
+              - read:user
+        provider:
+          facebook:
+            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+app:
+  auth:
+    tokenSecret: ${TOKEN_SECRET}
+    tokenExpirationMsec: 864000000
+  oauth2:
+    # After successfully authenticating with the OAuth2 Provider,
+    # we'll be generating an auth token for the user and sending the token to the
+    # redirectUri mentioned by the client in the /oauth2/authorize request.
+    # We're not using cookies because they won't work well in mobile clients.
+    # redirect uri after successfull login
+    authorizedRedirectUris:
+      - http://localhost:8080/auth/home
